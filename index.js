@@ -56,8 +56,17 @@ Be concise and professional.
     })
   });
 
-  const data = await ai.json();
-  const reply = data.output_text;
+const data = await ai.json();
+
+// Most reliable: use output_text if available, otherwise fallback
+const reply =
+  data?.output_text
+  || data?.output?.[0]?.content?.[0]?.text
+  || data?.output?.[0]?.content?.[0]?.value
+  || "I couldn't generate a response. Please escalate to Compliance/Legal.";
+
+// Optional: log once to inspect shape in Render logs
+console.log("OpenAI response keys:", Object.keys(data || {}));
 
   await fetch("https://slack.com/api/chat.postMessage", {
     method: "POST",
